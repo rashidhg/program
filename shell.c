@@ -1,11 +1,11 @@
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include<string.h>
-#include<unistd.h>
-#include<sys/types.h>
-#include<sys/wait.h>
-#include<sys/stat.h>
-#include<fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 void main(int argc,char ** argv)
 {
@@ -22,9 +22,9 @@ void main(int argc,char ** argv)
     daemon = 0;
     while(1)
 	{
-        printf("> ");
+        printf(">> ");
         fgets(com,100,stdin);
-        if(strcmp(com,"exit") == 0)
+        if(strcmp(com,"exit\n") == 0)
             break;
         paraCount = 0;
         char * token = strtok(com,delim);
