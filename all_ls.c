@@ -13,7 +13,7 @@ void list_all(char *mydir, int space)
     while((str = readdir(dir)) != NULL)
     {
         for (i = 0; i < space; ++i)
-            printf(" ");
+            printf("-");
         printf("%s\n", str->d_name);
         
         strcpy(path, mydir);
@@ -37,7 +37,7 @@ void list_all(char *mydir, int space)
 
 int main()
 {   
-    char mydir[100] = "E:/Video/";
+    char mydir[100] = "E:/Wallpaper/";				//	It prints out all directories and files
     
     list_all(mydir, 0);  //getcwd(mydir, 100);
   
