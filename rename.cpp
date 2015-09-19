@@ -10,7 +10,7 @@ using namespace std;
 
 int main()
 {
-    string mydir = "E:/Song/Video/BollyWood/";
+    string mydir = "E:/Song/Video/BollyWood/";           // Directory Path in which you want to change name
     string path, tmp, old;
     DIR* dir = opendir(mydir.c_str());
     
@@ -40,7 +40,7 @@ int main()
 //			}
 //		}
 		
-		old = mydir + path;
+	old = mydir + path;
         path = mydir + path.substr(i);
         
         rename(old.c_str(), path.c_str());
