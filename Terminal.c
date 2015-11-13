@@ -6,18 +6,19 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-void main(int argc,char ** argv)
+#define SZ 100
+
+int main(int argc,char ** argv)
 {
     pid_t pid;
     char para[5][20];
-    char com[100];
+    char com[SZ];
 
     int paraCount;
     char* fileNameOut = NULL;
     char* fileNameIn = NULL;
     char* pipein = NULL;
     char* pipeout = NULL; 
-    const char delim[2] = " ";
     char dirnIn = NULL;
     char dirnOut = NULL;
     int daemon = 0;
@@ -25,15 +26,16 @@ void main(int argc,char ** argv)
     while(1)
     {
         printf(">> ");
-        fgets(com,100,stdin);
-        if(strcmp(com,"exit\n") == 0)
+        fgets(com, SZ, stdin);
+        if(strcmp(com, "exit\n") == 0)
             break;
+
         paraCount = 0;
-        char * token = strtok(com,delim);
+        char * token = strtok(com, " ");
         while(token != NULL)
         {
             strcpy(para[paraCount++],token);
-            token = strtok(NULL,delim);
+            token = strtok(NULL, " ");
         }
 
         para[paraCount-1][strlen(para[paraCount-1])-1] = '\0';
@@ -46,6 +48,7 @@ void main(int argc,char ** argv)
 	{
             if(para[i][0] == '-')
                 arg = para[i];
+            
             else if(para[i][0] == '&')
                 daemon = 1;
 
@@ -55,6 +58,7 @@ void main(int argc,char ** argv)
 		pipein = para[i-1];
 		pipeout = para[i+1];
             }
+	    
 	    else if(para[i][0] == '<')
 	    {
                 dirnIn = '<';
@@ -70,41 +74,32 @@ void main(int argc,char ** argv)
         //forking
 
         if((pid = fork()) == -1)
-		printf("Fork Error\n");
+	    printf("Fork Error\n");
 
         if(pid == 0)
 	{
-	    printf("Here Now 1");
-            if(daemon == 1)
+	    if(daemon == 1)
             {
-		printf("Here Now 2");
-                setsid();
+	        setsid();
                 umask(0);
             }
             int in = NULL;
             int out = NULL;
 	   
-	    printf("Here Now 3");
-            
-            if(pipe == 1)
+	    if(pipe == 1)
 	    {
-		printf("Here");
-//		int dummy = open("dummy.txt", O_CREAT | O_RDWR);             can't access same variable
-		
-//		int stdoutCopy = dup(STDOUT_FILENO);
-
 /*	
 	statement after execl doesn't execute because whole address space of process is replaced by given command's address space    
 	so if you want to do something after execl (as below : after first command second one should execute)  so fork the process
 	and do the second thing in child process after wait (so that first process may end)
 */
 
-		if(fork())
+		int pidp = fork();
+		if(pidp == 0)
 		{
 			int dummy = open("dummy.txt", O_CREAT | O_WRONLY);
 			dup2(dummy, STDOUT_FILENO);
 			execl(pipein, pipein, NULL, NULL);
-//			dup2(stdoutCopy, STDOUT_FILENO);
 		}
 		else
 		{
@@ -113,7 +108,6 @@ void main(int argc,char ** argv)
 			dup2(dummy, STDIN_FILENO);
 			execl(pipeout, pipeout, NULL, NULL);			
 		}
-		close(dummy);
 	    }
 	    else
 	    {
@@ -127,12 +121,12 @@ void main(int argc,char ** argv)
 		    in = open(fileNameIn, O_RDONLY);
 		    dup2(in, STDIN_FILENO);
 		}
-		printf("Before execl\n");
+
 		if(execl(command, command, arg, NULL) == -1)
 		    exit(EXIT_FAILURE);
 	    }        
 	}
-        else               //parent process
+        else               
 	{ 
             if(daemon == 0)
 	    {
